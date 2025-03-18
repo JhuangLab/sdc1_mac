@@ -1,0 +1,17 @@
+# Preface {.unnumbered}
+
+This is a Quarto book of code accompanying our manuscript "Immune evasion in pancreatic cancer driven by a CD138+ tumor-associated macrophage-SiglecF+ neutrophil feedforward loop".
+
+```{r echo=FALSE}
+pkgs <- c("fs", "configr", "stringr", "ggpubr", "ggthemes", 
+          "jhtools", "glue", "ggsci", "patchwork", "tidyverse", "dplyr", "Seurat", 
+          "scDblFinder", "paletteer", "readxl", "writexl", "ComplexHeatmap", 
+          "circlize", "data.table", "survminer", "survival")  
+for (pkg in pkgs){
+  suppressPackageStartupMessages(library(pkg, character.only = T))
+}
+```
+
+```{r}
+sessionInfo()
+```

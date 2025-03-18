@@ -1,0 +1,2 @@
+ID,Description,setSize,enrichmentScore,NES,pvalue,p.adjust,qvalue,rank,leading_edge,core_enrichment
+bulk_mks,bulk_mks,31,0.8279159313599016,2.0712200505184453,1.1900515699569924e-7,1.1900515699569924e-7,NA,234,"tags=71%, list=12%, signal=64%",Hilpda/Inhba/Cxcl3/Egln3/Ptgs2/Il1a/Thbs1/Nos2/Nt5e/Pdpn/Il6/Cxcl1/Plaur/Sdc1/Mmp8/Acod1/Slc7a11/F7/Gdf15/Runx3/Gcnt2/Slpi

@@ -1,0 +1,159 @@
+# Figure 2
+
+Package load and plot settings.
+
+```{r warning=FALSE, message=FALSE}
+pkgs <- c("fs", "futile.logger", "configr", "stringr", "ggpubr", "ggthemes", 
+          "jhtools", "glue", "ggsci", "patchwork", "tidyverse", "dplyr", "Seurat", 
+          "scDblFinder", "paletteer", "readxl", "writexl", "ComplexHeatmap", 
+          "circlize", "data.table")  
+for (pkg in pkgs){
+  suppressPackageStartupMessages(library(pkg, character.only = T))
+}
+fs::dir_create("./results/fig2")
+
+## themes ----
+my_theme1 <- theme_classic(base_size = 8) + 
+  theme(legend.key.size = unit(3, "mm"), axis.text = element_text(color = "black"))
+## colors ----
+mmu_mph_cols <- c("MM1" = "#1963b3", "MM2" = "#7ca3b8", "MM3" = "#97cebf", 
+                  "MM4" = "#789cf2", "MM5" = "#80c187", "MM6" = "#3f8896", 
+                  "MM7" = "#28c694")
+
+```
+
+## (a) Mouse 5' single cell data
+
+UMAP of mouse macrophage subtypes
+
+```{r warning=FALSE, message=FALSE}
+## fig2a -----
+seu_2samp <- read_rds("./data/seu_2samp.rds")
+dim1 <- Seurat::DimPlot(seu_2samp, reduction = "lda_umap", pt.size = 1e-2) + 
+  my_theme1 + Seurat::NoAxes() + 
+  ggplot2::coord_fixed() + scale_color_manual(values = mmu_mph_cols)
+ggsave("./results/fig2/fig2a_mouse_mph_10x_5_dim1.pdf", dim1, width = 4, height = 3, unit = "in")
+
+```
+
+```{r echo=FALSE, fig.width = 6, fig.height = 5}
+dim1
+```
+
+## (b) Gene set enrichment analysis
+
+GSEA barplot of MM1 markers
+
+```{r warning=FALSE, message=FALSE}
+## fig2b -----
+pathways <- c("GOBP_CELLULAR_RESPONSE_TO_HYPOXIA", "GOBP_NEUTROPHIL_CHEMOTAXIS", 
+              "GOBP_REGULATION_OF_LIPID_TRANSPORT", "GOBP_ACUTE_INFLAMMATORY_RESPONSE", 
+              "GOBP_POSITIVE_REGULATION_OF_SECRETION", "GOBP_NEUTROPHIL_HOMEOSTASIS")
+dw_pths <- 
+  c("GOBP_IMMUNOGLOBULIN_PRODUCTION_INVOLVED_IN_IMMUNOGLOBULIN_MEDIATED_IMMUNE_RESPONSE", 
+    "GOBP_REGULATION_OF_NATURAL_KILLER_CELL_MEDIATED_IMMUNITY", 
+    "GOBP_ANTIGEN_PROCESSING_AND_PRESENTATION_OF_EXOGENOUS_PEPTIDE_ANTIGEN_VIA_MHC_CLASS_II", 
+    "GOBP_DENDRITIC_CELL_CHEMOTAXIS", 
+    "GOBP_OXIDATIVE_PHOSPHORYLATION")
+
+gsea_res <- read_tsv("./data/gsea_barplot_result.tsv") %>% 
+  dplyr::filter(`GS<br> follow link to MSigDB` %in% c(pathways, dw_pths)) %>% 
+  dplyr::distinct()
+up_labels = c("GO:0071456", "GO:0090022", "GO:0032368", "GO:0002526", 
+              "GO:0051047", "GO:0001780")
+dw_labels = c("GO:0002381", "GO:0002715", "GO:0019886", "GO:0002407", 
+              "GO:0006119")
+up_col = "#B92923" 
+dw_col = "#2F4A99"
+plot_title = "GSEA | MM1 TAMs"
+up_terms = pathways
+dw_terms = dw_pths
+
+up_term2 <- up_terms %>% str_replace_all("_", " ") %>% str_to_lower()
+dw_term2 <- dw_terms %>% str_replace_all("_", " ") %>% str_to_lower()
+
+names(up_labels) <- up_term2
+names(dw_labels) <- dw_term2
+gsea_sel <- parallel::mclapply(c(up_term2, dw_term2), \(trm){
+    dplyr::filter(gsea_res, NAME %in% trm) %>% mutate(all_ids = c(up_labels, dw_labels)[trm])
+}, mc.cores = length(c(up_term2, dw_term2))) %>% bind_rows() %>% 
+  mutate(trends = case_when(NES > 0 ~ "up", TRUE ~ "down")) %>% 
+  dplyr::group_by(trends) %>% 
+  dplyr::arrange(NES) %>% dplyr::mutate(NAME = fct(NAME)) %>% 
+  dplyr::mutate(up_ids = case_when(NES > 0 ~ all_ids, TRUE ~ NA), 
+                down_ids = case_when(NES < 0 ~ all_ids, TRUE ~ NA)) %>% 
+  #### in case there are many matches
+  dplyr::mutate(up_terms = case_when(NES > 0 ~ NAME, TRUE ~ NA), 
+                down_terms = case_when(NES < 0 ~ NAME, TRUE ~ NA)) %>% 
+  mutate(NAME = NAME %>% str_sub(start = 6) %>% str_to_sentence()) %>% 
+  ungroup() %>% dplyr::arrange(NES) %>% mutate(NAME = fct(NAME))
+### plot
+trnd_cols <- c("up" = up_col, "down" = dw_col)
+tst_bar <- ggplot2::ggplot(gsea_sel, aes(x = NES, y = NAME, fill = trends)) + 
+  geom_bar(stat = "identity") + scale_fill_manual(values = trnd_cols) + 
+  geom_text(aes(label = up_terms %>% str_sub(start = 6) %>% stringr::str_replace_all("_", " ") %>% 
+                  str_to_sentence() %>% str_wrap(., width = 40), x = -0.1), 
+            size = 1.8, vjust = .5, hjust = 1) + 
+  geom_text(aes(label = down_terms %>% str_sub(start = 6) %>% stringr::str_replace_all("_", " ") %>% 
+                  str_to_sentence() %>% str_wrap(., width = 55), x = 0.1), 
+            size = 1.8, vjust = .5, hjust = 0) + 
+  geom_text(aes(label = up_ids, x = 0.5), size = 2) + 
+  geom_text(aes(label = down_ids, x = -0.5), size = 2) + 
+  theme_classic(base_size = 8) + 
+  theme(axis.title.y = element_blank(), legend.position = "none", axis.ticks.y = element_blank(), 
+        axis.text.y = element_blank(), axis.line.y = element_blank(), 
+        plot.title = element_text(hjust = 0.5), axis.text = element_text(color = "black")) + 
+  labs(title = plot_title) 
+ggsave("./results/fig2/fig2b_gsea_res_barplot.pdf", tst_bar, height = 6.5, width = 7.5, unit = "cm")
+
+```
+
+```{r echo=FALSE, fig.height = 6.5, fig.width = 7.5}
+tst_bar
+```
+
+## (c) Function of macrophage subtype MM1
+
+Heatmap of function markers
+
+```{r warning=FALSE, message=FALSE}
+## fig2c ---- 
+genes_pth1 <- c("Cxcl3", "Lgals3", "Cxcl1", "Cxcl2")
+genes_pth2 <- c("Kdm5b", "Mif", "P2ry2", "Prelid1")
+genes_pth3 <- c("F7", "Adam8", "Il6", "Saa3")
+genes_pth4 <- c("Egln3", "Bnip3", "Bnip3l", "Egln1")
+
+pth_genes <- c(genes_pth1, genes_pth2, genes_pth3, genes_pth4)
+expr_df <- LayerData(seu_2samp[["RNA"]], layer = "data")[pth_genes, ] %>% 
+  as.matrix() %>% t() %>% as.data.frame() %>% mutate(anot = seu_2samp$anot_fin)
+
+gene_lst <- list(`Neutrophil chemotaxis` = genes_pth1, 
+                      `Lipid transport` = genes_pth2, 
+                      `Acute inflammatory response` = genes_pth3, 
+                      `Cellular response to hypoxia` = genes_pth4)
+plst1 <- lapply(names(gene_lst), \(nm) {
+  mtx <- Seurat::AverageExpression(seu_2samp, features = gene_lst[[nm]])[[1]] %>% 
+    t() %>% scale() %>% t()
+  df1 <- mtx %>% as.data.frame() %>% rownames_to_column("gene") %>% 
+    tidyr::pivot_longer(cols = -1, values_to = "expr", names_to = "type")
+  p1 <- ggplot2::ggplot(df1, aes(x = gene, y = type, fill = expr)) + 
+    geom_tile() + my_theme1 + viridis::scale_fill_viridis() + labs(title = nm) + 
+    Seurat::RotatedAxis() + labs(y = "", x = "") + 
+    theme(plot.title = element_text(size = 8, hjust = .5), 
+          axis.line = element_blank(), 
+          axis.ticks = element_blank()) + 
+    ggplot2::coord_flip()
+  if(nm != "Neutrophil chemotaxis") {
+    p1 <- p1 + 
+      Seurat::NoLegend()
+  }
+  return(p1)
+})
+p <- patchwork::wrap_plots(plst1, ncol = 1, guides = "collect")
+ggsave("./results/fig2/fig2c_path_genes_tile.pdf", p, width = 6, height = 14, unit = "cm")
+
+```
+
+```{r echo=FALSE, fig.width = 6, fig.height = 14, fig.align='center'}
+p
+```
