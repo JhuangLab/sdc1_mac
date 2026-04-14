@@ -2,7 +2,7 @@
 
 Package load and plot settings.
 
-```{r warning=FALSE}
+```{r warning=FALSE, echo=TRUE, eval=FALSE}
 pkgs <- c("fs", "configr", "stringr", "ggpubr", "ggthemes", 
           "jhtools", "glue", "ggsci", "patchwork", "tidyverse", "dplyr", "Seurat", 
           "scDblFinder", "paletteer", "readxl", "writexl", "ComplexHeatmap", 
@@ -59,7 +59,7 @@ mmu_cols <- c("B cells" = "#e8d056", "CAFs" = "#20B2AA", "DCs" = "#FFA500",
 
 ## (a) UMAP of all cell types
 
-```{r cache=FALSE}
+```{r echo=TRUE, eval=FALSE}
 hsa_all <- read_rds("./data/seu_all_fil1.rds")
 Idents(hsa_all) <- hsa_all$anot_modified1 %>% as.character() %>% 
   fct(., levels = c("Acinar cells", "Ductal cells",
@@ -78,7 +78,7 @@ ggsave("./results/fig1_s1/fig1a_rpca_umap_all_ctypes.pdf",
 
 ```
 
-```{r echo=FALSE, fig.width = 7, fig.height = 4.8}
+```{r fig.width = 7, fig.height = 4.8, echo=TRUE, eval=FALSE}
 p1
 ```
 
@@ -86,7 +86,7 @@ p1
 
 Dotplot of cell type markers
 
-```{r cache=FALSE, warning=FALSE, message=FALSE}
+```{r cache=FALSE, warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 endocrine_mks <- c("CHGB", "GCG", "SST", "DPP6", "KCNMB2")
 ductal_mks <- c("KRT19", "MMP7", "KRT7", "KRT8")
 acinar_mks <- c("AMBP", "CFTR", "PRSS1", "CTRB1", "CTRB2")
@@ -114,13 +114,13 @@ ggsave("results/fig1_s1/figS1a_hsa_all_dot.pdf", dot1, width = 16, height = 8, u
 
 ```
 
-```{r echo=FALSE, fig.width = 16, fig.height = 8}
+```{r echo=FALSE, fig.width = 16, fig.height = 8, echo=TRUE, eval=FALSE}
 dot1
 ```
 
 ## (b) Cell type proportion
 
-```{r message=FALSE, cache=FALSE}
+```{r message=FALSE, cache=FALSE, echo=TRUE, eval=FALSE}
 df <- hsa_all@meta.data[, c("sample_id", "anot_modified1", "type2")] %>% 
   as_tibble(rownames = "barcode")
 df_ctype <- df %>% group_by(type2, anot_modified1) %>% dplyr::summarise(nc = n()) %>%
@@ -143,13 +143,13 @@ ggsave("./results/fig1_s1/fig1b_bar.pdf", a, width = 4, height = 5, unit = "cm")
 
 ```
 
-```{r echo=FALSE, fig.width = 4, fig.height = 5, fig.align='center'}
+```{r echo=FALSE, fig.width = 4, fig.height = 5, fig.align='center', echo=TRUE, eval=FALSE}
 a
 ```
 
 Proportion change between adjacent tissue and tumor
 
-```{r warning=FALSE, message=FALSE, cache=FALSE}
+```{r warning=FALSE, message=FALSE, cache=FALSE, echo=TRUE, eval=FALSE}
 df_ctype$type2 <- factor(df_ctype$type2, levels = c("Adjacent tissue", "Tumor"))
 df_sam <- df %>% group_by(sample_id, type2, anot_modified1) %>%
   dplyr::summarise(nc = n()) %>% group_by(sample_id, type2) %>%
@@ -202,7 +202,7 @@ ggsave("./results/fig1_s1/fig1b_point_line.pdf", p2, width = 2, height = 6, unit
 
 ```
 
-```{r echo=FALSE, fig.width = 2, fig.height = 6, fig.align='center'}
+```{r echo=FALSE, fig.width = 2, fig.height = 6, fig.align='center', echo=TRUE, eval=FALSE}
 p2
 ```
 
@@ -210,7 +210,7 @@ p2
 
 Boxplot of T/NK cell frequency in tumor and adjacent tissue
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 meta_hsa_all <- read_rds("./data/metadata_new.rds")
 cd45_all <- meta_hsa_all %>% dplyr::select(all_of(c("anot_modified1", "type2", "sample_id"))) %>% 
   dplyr::filter(anot_modified1 %in% c("Macrophages", "B cells", "T/NK", "Neutrophils", 
@@ -249,13 +249,13 @@ ggsave("./results/fig1_s1/fig1c_tcell_cd45_ratio_boxplot.pdf", box1, width = 6, 
 
 ```
 
-```{r echo=FALSE, fig.width = 6, fig.height = 4}
+```{r echo=FALSE, fig.width = 6, fig.height = 4, echo=TRUE, eval=FALSE}
 box1
 ```
 
 ### Fig.S1b UMAP of T/NK cells
 
-```{r warning=FALSE}
+```{r warning=FALSE, echo=TRUE, eval=FALSE}
 # figS1b: 4*4 -----
 dim1 <- Seurat::DimPlot(tnk_new, reduction = "cca4umap",  
                         raster = T, pt.size = 1.5) + 
@@ -267,7 +267,7 @@ ggsave("./results/fig1_s1/figS1b_tnk_umap_dim1.pdf", dim1, width = 7, height = 6
 
 ```
 
-```{r echo=FALSE, fig.width = 7, fig.height = 6}
+```{r echo=FALSE, fig.width = 7, fig.height = 6, echo=TRUE, eval=FALSE}
 dim1
 ```
 
@@ -275,7 +275,7 @@ dim1
 
 Dotplot of T/NK cell markers
 
-```{r warning=FALSE}
+```{r warning=FALSE, echo=TRUE, eval=FALSE}
 # figS1c: 3*4 -----
 tnk_feats <- c("CD2", "CD3D", "CD3E", "CD4", "FOXP3", "CCR7", 
                "CD8A", "CD8B", "GZMK", "NKG7", "KLRD1", "GZMB")
@@ -289,13 +289,13 @@ ggsave("./results/fig1_s1/figS1c_tnk_dotplot.pdf", dot2, width = 9, height = 5, 
 
 ```
 
-```{r echo=FALSE, fig.width = 9, fig.height = 5}
+```{r echo=FALSE, fig.width = 9, fig.height = 5, echo=TRUE, eval=FALSE}
 dot2
 ```
 
 ## (d) Cytotoxicity score of T/NK cells
 
-```{r warning=FALSE}
+```{r warning=FALSE, echo=TRUE, eval=FALSE}
 ssgsea_score <- read_rds("./data/tcellsi_ssgsea_score.rds")
 ssgsea_score <- ssgsea_score[, colnames(tnk_new)]
 df4 <- ssgsea_score %>% t() %>% as.data.frame() %>% 
@@ -324,7 +324,7 @@ ggsave("./results/fig1_s1/fig1d_tcell_type_cytotoxic_boxplot.pdf", box2, width =
 
 ```
 
-```{r echo=FALSE, fig.width = 6, fig.height = 5}
+```{r echo=FALSE, fig.width = 6, fig.height = 5, echo=TRUE, eval=FALSE}
 box2
 ```
 
@@ -332,7 +332,7 @@ box2
 
 UMAP of macrophage subtypes
 
-```{r warning=FALSE}
+```{r warning=FALSE, echo=TRUE, eval=FALSE}
 ## colors ----
 hsa_mph_cols <- c("HM1" = "#1963b3", "HM2" = "#7ca3b8", "HM3" = "#97cebf", 
                   "HM4" = "#789cf2", "HM5" = "#8071e7", "HM6" = "#bf88d6")
@@ -348,7 +348,7 @@ ggsave("./results/fig1_s1/fig1e_hsa_mph_dim1.pdf", dim1, width = 5, height = 4.8
 
 ```
 
-```{r echo=FALSE, fig.width = 5, fig.height = 4.8}
+```{r echo=FALSE, fig.width = 5, fig.height = 4.8, echo=TRUE, eval=FALSE}
 dim1
 ```
 
@@ -356,7 +356,7 @@ dim1
 
 Heatmap of macrophage subtype markers
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 # figS1d: -----
 mks_hm1 <- c("HILPDA", "SLC2A1", "EGLN3", "HK2", "NDRG1", "INHBA")
 mks_hm2 <- c("SELENOP", "IGF1", "C1QC", "C1QB", "C1QA", "HGF")
@@ -385,13 +385,13 @@ tile1 <- ggplot2::ggplot(df1, aes(x = gene, y = type, fill = expr)) +
 ggsave("./results/fig1_s1/figS1d_hsa_mph_sel_mks_heatmap1.pdf", tile1, width = 7, height = 10, unit = "cm")
 ```
 
-```{r echo=FALSE, fig.width = 7, fig.height = 10}
+```{r echo=FALSE, fig.width = 7, fig.height = 10, echo=TRUE, eval=FALSE}
 tile1
 ```
 
 ## (f) Macrophage subtype proportion
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 ## fig1f: bar and lines ---
 cnt_df <- hsa_mph@meta.data %>% dplyr::select(all_of(c("anot_fin", "type2"))) %>% 
   group_by(anot_fin, type2) %>% dplyr::count()
@@ -405,13 +405,13 @@ ggsave("./results/fig1_s1/fig1f_mph_hsa_anot_fin_barplot.pdf", bar2, width = 4, 
 
 ```
 
-```{r echo=FALSE, fig.width = 4, fig.height = 5, fig.align='center'}
+```{r echo=FALSE, fig.width = 4, fig.height = 5, fig.align='center', echo=TRUE, eval=FALSE}
 bar2
 ```
 
 Proportion change between adjacent tissue and tumor
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 ## lines ---
 cnt_df2 <- hsa_mph@meta.data %>% 
   dplyr::select(all_of(c("type2", "anot_fin", "sample_id"))) %>% 
@@ -439,7 +439,7 @@ ggsave("./results/fig1_s1/fig1f_mph_hsa_prop_line.pdf", p1, width = 2, height = 
 
 ```
 
-```{r echo=FALSE, fig.width = 2, fig.height = 6, fig.align='center'}
+```{r echo=FALSE, fig.width = 2, fig.height = 6, fig.align='center', echo=TRUE, eval=FALSE}
 p1
 ```
 
@@ -447,7 +447,7 @@ p1
 
 HM1 score
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, echo=TRUE, eval=FALSE}
 ## colors -----
 color <- c("High" = "#B92923", "Low" = "#2F4A99")
 
@@ -489,13 +489,13 @@ ggsave("./results/fig1_s1/fig1g_boxplot_HM1_gsva_241101.pdf", vln4, width = 7, h
 
 ```
 
-```{r echo=FALSE, fig.width = 7, fig.height = 3}
+```{r echo=FALSE, fig.width = 7, fig.height = 3, echo=TRUE, eval=FALSE}
 vln4
 ```
 
 ### Fig.S1e HM5/HM6 score
 
-```{r warning=FALSE,message=FALSE}
+```{r warning=FALSE,message=FALSE, echo=TRUE, eval=FALSE}
 score_vln_func1 <- function(score_df = NULL, col_nm = NULL, label = NULL) {
   color <- c("High" = "#B92923", "Low" = "#2F4A99")
   colnames(score_df) <- 
@@ -542,19 +542,19 @@ ggsave("./results/fig1_s1/figS1e_boxplot_HM5_gsva.pdf", vln5, width = 10, height
 
 ```
 
-```{r echo=FALSE, fig.width = 10, fig.height = 3}
+```{r echo=FALSE, fig.width = 10, fig.height = 3, echo=TRUE, eval=FALSE}
 vln5
 ```
 
 HM6 score
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 score_df2 <- read_csv("./data/TCGA_tide_h6.csv")
 vln6 <- score_vln_func1(score_df = score_df2, col_nm = "h6_score", label = "HM6")
 ggsave("./results/fig1_s1/figS1e_boxplot_HM6_gsva.pdf", vln6, width = 10, height = 3, units = "cm")
 ```
 
-```{r echo=FALSE, fig.width = 10, fig.height = 3}
+```{r echo=FALSE, fig.width = 10, fig.height = 3, echo=TRUE, eval=FALSE}
 vln6
 ```
 
@@ -562,7 +562,7 @@ vln6
 
 Kaplan-Meier curve stratified by HM1 score
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 TCGA_tide_m1_surv <- read_csv("./data/TCGA_tide_m1_surv.csv")
 TCGA_tide_m1_surv <- mutate(TCGA_tide_m1_surv, OS.time = OS.time/30)
 
@@ -595,13 +595,13 @@ ggsave("./results/fig1_s1/fig1h_TCGA_HM1_score_level_KM_OS.pdf",
        p1, width = 5, height = 4, unit = "cm")
 ```
 
-```{r echo=FALSE, fig.width = 5, fig.height = 4}
+```{r echo=FALSE, fig.width = 5, fig.height = 4, echo=TRUE, eval=FALSE}
 p1
 ```
 
 ### Fig.S1f
 
-```{r warning=FALSE, message=FALSE, fig.width = 5, fig.height = 4}
+```{r warning=FALSE, message=FALSE, fig.width = 5, fig.height = 4, echo=TRUE, eval=FALSE}
 # figS1f -----
 surv_df0 <- read_csv("./data/TCGA_tide_m1_surv.csv")
 surv_df1 <- read_csv("./data/TCGA_tide_h4_surv.csv")
@@ -651,7 +651,7 @@ for(idx in 2:nrow(tbl1)) {
 
 UMAP of all cell types
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 mmu_mph_cols <- c("MM1" = "#1963b3", "MM2" = "#7ca3b8", "MM3" = "#97cebf", 
                   "MM4" = "#789cf2", "MM5" = "#80c187", "MM6" = "#3f8896", 
                   "MM7" = "#28c694")
@@ -667,7 +667,7 @@ ggsave("./results/fig1_s1/fig1i_mmu_all_cells_dim1_241101a.pdf", mmu_dim1, width
 
 ```
 
-```{r echo=FALSE, fig.width = 6, fig.height = 4}
+```{r echo=FALSE, fig.width = 6, fig.height = 4, echo=TRUE, eval=FALSE}
 mmu_dim1
 ```
 
@@ -675,7 +675,7 @@ mmu_dim1
 
 Dotplot of cell type markers
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 # figS1g: 15.3*8 or 8*12 -----
 b_mks <- c("Cd79a", "Cd19", "Cd79b", "Ms4a1")
 t_mks <- c("Cd3d", "Cd3e", "Nkg7", "Klrd1", "Cd4", "Cd8a")
@@ -704,13 +704,13 @@ ggsave("./results/fig1_s1/figS1g_mouse_all_cells_dotplot2.pdf", dot1, width = 8,
 
 ```
 
-```{r echo=FALSE, fig.width = 8, fig.height = 12}
+```{r echo=FALSE, fig.width = 8, fig.height = 12, echo=TRUE, eval=FALSE}
 dot1
 ```
 
 ## (j) Mouse macrophage subtype
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 ## fig1k: 6*4 inch
 rds_fn10 <- 
   "/cluster/home/danyang_jh/projects/panlab/analysis/wangchao/mouse/tenx/merged_new/macrophage/mph_fin/mph_mmu_seu_anot_fin.rds"
@@ -729,7 +729,7 @@ ggsave("./results/fig1_s1/fig1j_mmu_mph_dim1.pdf", dim1, width = 6, height = 4, 
 
 Calculate human TAM markers score on mouse
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 # fig1k -----
 gsea_res <- read_csv("./data/gsea_res_mph_hsa2mmu.csv")
 dot1 <- gsea_res %>% dplyr::arrange(NES) %>% 
@@ -747,7 +747,7 @@ ggsave("./results/fig1_s1/fig1k_human_mouse_mph_gsea_dot1.pdf", dot1, width = 7,
 
 ```
 
-```{r echo=FALSE, fig.width = 7, fig.height = 6}
+```{r echo=FALSE, fig.width = 7, fig.height = 6, echo=TRUE, eval=FALSE}
 dot1
 ```
 
@@ -755,7 +755,7 @@ dot1
 
 Human-mouse common markers
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 # fig1l: 4*4 inch in total
 human <- read_rds("./data/mph_hsa_seu_anot_fin.rds")
 mouse <- read_rds("./data/mph_mmu_seu_anot_fin.rds")
@@ -819,7 +819,7 @@ ComplexHeatmap::draw(htp_lst)
 d <- dev.off()
 ```
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 ComplexHeatmap::draw(htp_lst)
 ```
 
@@ -827,7 +827,7 @@ ComplexHeatmap::draw(htp_lst)
 
 Mouse TAM markers expression on 10x 3' platform and 10x 5' platform
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 # figS1h: mouse markers of 3' and 5' mouse macrophage ----
 mks_mm1 <- c("Inhba", "Egln3", "Hilpda", "Ndrg1", "Slc2a1", "Hk2")
 mks_mm2 <- c("Igf1", "Selenop", "C1qc", "C1qa", "C1qb", "Hgf")
@@ -872,6 +872,6 @@ draw(htp_lst)
 d <- dev.off() 
 ```
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 draw(htp_lst)
 ```

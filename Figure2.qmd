@@ -2,7 +2,7 @@
 
 Package load and plot settings.
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 pkgs <- c("fs", "futile.logger", "configr", "stringr", "ggpubr", "ggthemes", 
           "jhtools", "glue", "ggsci", "patchwork", "tidyverse", "dplyr", "Seurat", 
           "scDblFinder", "paletteer", "readxl", "writexl", "ComplexHeatmap", 
@@ -26,7 +26,7 @@ mmu_mph_cols <- c("MM1" = "#1963b3", "MM2" = "#7ca3b8", "MM3" = "#97cebf",
 
 UMAP of mouse macrophage subtypes
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 ## fig2a -----
 seu_2samp <- read_rds("./data/seu_2samp.rds")
 dim1 <- Seurat::DimPlot(seu_2samp, reduction = "lda_umap", pt.size = 1e-2) + 
@@ -36,7 +36,7 @@ ggsave("./results/fig2/fig2a_mouse_mph_10x_5_dim1.pdf", dim1, width = 4, height 
 
 ```
 
-```{r echo=FALSE, fig.width = 6, fig.height = 5}
+```{r echo=FALSE, fig.width = 6, fig.height = 5, echo=TRUE, eval=FALSE}
 dim1
 ```
 
@@ -44,7 +44,7 @@ dim1
 
 GSEA barplot of MM1 markers
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 ## fig2b -----
 pathways <- c("GOBP_CELLULAR_RESPONSE_TO_HYPOXIA", "GOBP_NEUTROPHIL_CHEMOTAXIS", 
               "GOBP_REGULATION_OF_LIPID_TRANSPORT", "GOBP_ACUTE_INFLAMMATORY_RESPONSE", 
@@ -108,7 +108,7 @@ ggsave("./results/fig2/fig2b_gsea_res_barplot.pdf", tst_bar, height = 6.5, width
 
 ```
 
-```{r echo=FALSE, fig.height = 6.5, fig.width = 7.5}
+```{r echo=FALSE, fig.height = 6.5, fig.width = 7.5, echo=TRUE, eval=FALSE}
 tst_bar
 ```
 
@@ -116,7 +116,7 @@ tst_bar
 
 Heatmap of function markers
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, echo=TRUE, eval=FALSE}
 ## fig2c ---- 
 genes_pth1 <- c("Cxcl3", "Lgals3", "Cxcl1", "Cxcl2")
 genes_pth2 <- c("Kdm5b", "Mif", "P2ry2", "Prelid1")
@@ -154,6 +154,6 @@ ggsave("./results/fig2/fig2c_path_genes_tile.pdf", p, width = 6, height = 14, un
 
 ```
 
-```{r echo=FALSE, fig.width = 6, fig.height = 14, fig.align='center'}
+```{r echo=FALSE, fig.width = 6, fig.height = 14, fig.align='center', echo=TRUE, eval=FALSE}
 p
 ```

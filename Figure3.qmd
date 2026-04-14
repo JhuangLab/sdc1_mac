@@ -1,6 +1,6 @@
 # Figure 3
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 pkgs <- c("fs", "futile.logger", "configr", "stringr", "ggpubr", "ggthemes", 
           "jhtools", "glue", "ggsci", "patchwork", "tidyverse", "dplyr", "Seurat", 
           "scDblFinder", "paletteer", "readxl", "writexl", "ComplexHeatmap", 
@@ -25,7 +25,7 @@ mmu_mph_cols <- c("MM1" = "#1963b3", "MM2" = "#7ca3b8", "MM3" = "#97cebf",
 
 Heatmap of up-regulated genes in PGE2 & IL34 group.
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 ## fig3a -----
 selected_genes <- read_rds("./data/bulk_rna_select_genes.rds")
 fpkm5 <- read_csv("./data/wangchao_mouse_v2.csv") %>% dplyr::filter(gene_name %in% selected_genes) %>% as.data.frame() %>% 
@@ -58,13 +58,13 @@ d <- dev.off()
 
 ```
 
-```{r echo=FALSE, out.width = '800px', out.height='600px', fig.align='center'}
+```{r echo=FALSE, out.width = '800px', out.height='600px', fig.align='center', echo=TRUE, eval=FALSE}
 print(htp1)
 ```
 
 ## (b) GSEA plot of MM1 driver genes
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 ## fig3b: correlated driver genes gsea ----
 trm2gn2 <- read_rds("./data/trm2gn2_bulk_common_genes.rds")
 my_theme1 = ggplot2::theme_classic(base_size = 8) + 
@@ -91,7 +91,7 @@ ggsave("./results/fig3/fig3b_bulk_feats_corr_lineage_gsea_dot.pdf",
 
 ```
 
-```{r echo=FALSE, fig.width = 7, fig.height = 6}
+```{r echo=FALSE, fig.width = 7, fig.height = 6, echo=TRUE, eval=FALSE}
 gsea_p1
 ```
 
@@ -99,7 +99,7 @@ gsea_p1
 
 UMAP of pseudotime and fate probability
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 # 10x 3' Mph data
 mmu_mph <- read_rds("./data/mph_mmu_seu_anot_fin.rds")
 
@@ -120,13 +120,13 @@ ggsave("./results/fig3/figS2ab_monocle3_cellrank2.pdf", p, width = 6, height = 3
 
 ```
 
-```{r echo=FALSE, fig.width = 6, fig.height = 3}
+```{r echo=FALSE, fig.width = 6, fig.height = 3, echo=TRUE, eval=FALSE}
 p
 ```
 
 ### Fig.S2c Heatmap of fate genes
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 ## figS2c: specific gene heatmap ----
 genes = c("Arg1", "Spp1", "Gapdh", "Basp1", "Vegfa", "Il1a", "Ptgs2", 
           "Hilpda", "Cxcl2", "Slc2a1", "Inhba", "Prdx6", "Egln3", 
@@ -173,7 +173,7 @@ print(htkm)
 d <- dev.off()
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, echo=TRUE, eval=FALSE}
 print(htkm)
 ```
 
@@ -181,7 +181,7 @@ print(htkm)
 
 Dotplot of macrophage subtypes score
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 ## fig3c: ----
 gsea_dot_func1 <- function(mk_df = NULL, mph_names = NULL, fn = NULL){
   gsea_lst <- lapply(mph_names, \(nm){
@@ -211,7 +211,7 @@ ggsave("./results/fig3/fig3c_bulk2sce_gsea_dot.pdf", p, width = 6, height = 6, u
 
 ```
 
-```{r echo=FALSE, fig.width = 6, fig.height = 6, fig.align='center'}
+```{r echo=FALSE, fig.width = 6, fig.height = 6, fig.align='center', echo=TRUE, eval=FALSE}
 p
 ```
 
@@ -219,7 +219,7 @@ p
 
 3' Macrophage MM1 markers enrichment dotplot
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 # figS2d
 erch_res <- read_csv("./data/mph_mm1_kegg_erch_res.csv")
 tst1 <- erch_res %>% dplyr::filter(grepl("Environmental", category)) %>% 
@@ -247,6 +247,6 @@ ggsave("./results/fig3/figS2d_MM1_kegg_enrich_dot2.pdf", dot2, width = 10, heigh
 
 ```
 
-```{r echo=FALSE, fig.width = 10, fig.height = 8, fig.align='center'}
+```{r echo=FALSE, fig.width = 10, fig.height = 8, fig.align='center', echo=TRUE, eval=FALSE}
 dot2
 ```

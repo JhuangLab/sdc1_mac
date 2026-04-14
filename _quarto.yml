@@ -1,10 +1,11 @@
 project:
   type: book
+  output-dir: docs
 
 book:
   title: "SDC1 Macrophage"
   author: 
-    - name: "Danyang Zhao, Yingjiqiong Liang, Tao Zeng, Jinyan Huang"
+    - name: "Danyang Zhao, Tao Zeng, Jinyan Huang"
       email: "huangjinyan@zju.edu.cn"
   date: "2024-12-03"
   chapters:
