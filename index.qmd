@@ -2,7 +2,8 @@
 
 This is a Quarto book of code accompanying our manuscript "A CD138+ tumor-associated macrophage-Siglec-F+ neutrophil feedforward loop promotes immune evasion in pancreatic cancer".
 
-```{r echo=FALSE}
+
+```{r echo=FALSE, eval=FALSE}
 pkgs <- c("fs", "configr", "stringr", "ggpubr", "ggthemes", 
           "jhtools", "glue", "ggsci", "patchwork", "tidyverse", "dplyr", "Seurat", 
           "scDblFinder", "paletteer", "readxl", "writexl", "ComplexHeatmap", 
