@@ -1,5 +1,5 @@
 ---
-title: "fig5"
+title: "Figure 5"
 author: "Danyang Zhao"
 format:
   html:
