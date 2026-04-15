@@ -10,11 +10,16 @@ book:
   date: "2025-12-03"
   chapters:
     - index.qmd
-    - fig2.qmd
-    - fig3.qmd
-    - fig4.qmd
-    - fig5.qmd
-    - fig6.qmd
+    - href: fig2.qmd
+      text: Figure2
+    - href: fig3.qmd
+      text: Figure3
+    - href: fig4.qmd
+      text: Figure4
+    - href: fig5.qmd
+      text: Figure5
+    - href: fig6.qmd
+      text: Figure6
     
     - references.qmd
 

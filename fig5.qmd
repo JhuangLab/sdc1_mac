@@ -1,5 +1,5 @@
 ---
-title: "fig5-6: neutrophil related"
+title: "fig5"
 author: "Danyang Zhao"
 format:
   html:
@@ -7,6 +7,8 @@ format:
 execute:
   eval: false   
   echo: true
+  warning: false
+  message: false
 ---
 
 ## set-up
@@ -68,7 +70,7 @@ dev.off()
 
 ```
 
-![cellchat results from Mphs to Neutrophils](../fig5/fig5a_cellchat_netVisual_circle_every_weight_secret_signal.png)
+![cellchat results from Mphs to Neutrophils](images/fig5a_cellchat_netVisual_circle_every_weight_secret_signal.png)
 
 ## fig5b-c: Overview of neutrophil in scRNAseq
 
@@ -113,9 +115,9 @@ ggsave("fig5c_mmu_neu_sel_mks_heatmap.png", tile1, width = 9, height = 5, unit =
 
 ```
 
-![mouse neutrophil UMAP](../fig5/fig5b_mouse_neu_dim1.png)
+![mouse neutrophil UMAP](images/fig5b_mouse_neu_dim1.png)
 
-![mouse neutrophil marker heatmap](../fig5/fig5c_mmu_neu_sel_mks_heatmap.png)
+![mouse neutrophil marker heatmap](images/fig5c_mmu_neu_sel_mks_heatmap.png)
 
 ## fig5d: Consistence of specific treatment with Siglecf+ Neutrophils
 
@@ -134,34 +136,4 @@ ggsave(glue("fig5d_gsea_neutro_bulk2sce.png"), dot2, width = 8, height = 6, unit
 
 ```
 
-![mouse neutrophil GSEA](../fig5/fig5d_gsea_neutro_bulk2sce.png)
-
-## fig6i: KEGG enrichment in bulk RNA-seq
-
-```{r fig6i}
-## fig6i: bulk neutrophil kegg enrichment -----
-glue("{workdir}/fig6") %>% fs::dir_create() %>% setwd()
-csv_fn4 <- 
-  "/cluster/home/danyang_jh/projects/panlab/output/wangchao/mouse/tenx/rds/fig6i_neutrophil_kegg_enrich_res.csv"
-res2 <- read_csv(csv_fn4)
-terms_sel <- c(
-  "Rap1 signaling pathway", "Leukocyte transendothelial migration", 
-  "Neutrophil extracellular trap formation", "Arachidonic acid metabolism", 
-  "Glycosphingolipid biosynthesis", "MAPK signaling pathway", 
-  "Cell adhesion molecules", "Chemokine signaling pathway", "Phagosome"
-)
-df4barplot <- res2 %>% dplyr::filter(Description %in% terms_sel, pvalue < .1, Count > 3) %>% .[-5, ] %>% 
-  dplyr::arrange((trend), desc(pvalue)) %>% mutate(Description = fct(as.character(Description)))
-kegg_bar1 <- ggplot2::ggplot(df4barplot, aes(x = -log10(pvalue), y = Description)) + 
-  ggplot2::geom_bar(aes(fill = trend), stat = "identity", width = .8) + 
-  ggplot2::geom_text(aes(label = ID), x = .8, size = 2) + 
-  my_theme1 + theme(legend.position = "bottom", legend.margin = margin(l = -.2, r = .3, t = -.2, b = .1, unit = "cm"), 
-                    plot.margin = margin(l = -.2, r = .1, t = .2, b = .2, unit = "cm")) + 
-  scale_fill_manual(values = trends_cols) + 
-  labs(x = "-log10(pvalue)", y = "", fill = "Trend")
-ggsave("fig6i_kegg_enrich_nutrophil_bulk.pdf", kegg_bar1, width = 8, height = 4, unit = "cm")
-ggsave("fig6i_kegg_enrich_nutrophil_bulk.png", kegg_bar1, width = 8, height = 4, unit = "cm")
-
-```
-
-![mouse neutrophil bulk RNAseq KEGG enrich](../fig6/fig6i_kegg_enrich_nutrophil_bulk.png)
+![mouse neutrophil GSEA](images/fig5d_gsea_neutro_bulk2sce.png)

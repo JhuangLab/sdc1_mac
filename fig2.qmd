@@ -7,6 +7,8 @@ format:
 execute:
   eval: false   
   echo: true
+  warning: false
+  message: false
 ---
 
 ## set-up
@@ -87,9 +89,9 @@ ggsave("fig2b_5seq_marker_genes_v260130.png", fig2b, width = 11, height = 5, uni
 
 ```
 
-![fig2a: UMAP of mouse Mphs](../fig2/fig2a_5seq_umap.png)
+![fig2a: UMAP of mouse Mphs](images/fig2a_5seq_umap.png)
 
-![fig2b: mouse Mphs marker genes](../fig2/fig2b_5seq_marker_genes_v260130.png)
+![fig2b: mouse Mphs marker genes](images/fig2b_5seq_marker_genes_v260130.png)
 
 ## GSEA barplot of Sdc1+ Mphs
 
@@ -164,7 +166,7 @@ ggsave("fig2c_gsea_res_Sdc1_Mph_barplot.png", fig2c, height = 6, width = 7, unit
 
 ```
 
-![fig2c: mouse Mphs GSEA](../fig2/fig2c_gsea_res_Sdc1_Mph_barplot.png)
+![fig2c: mouse Mphs GSEA](images/fig2c_gsea_res_Sdc1_Mph_barplot.png)
 
 ## pathway representative genes
 
@@ -231,4 +233,4 @@ ggsave("fig2d_pathways_genes.png", fig2d, width = 10, height = 7, unit = "cm")
 
 ```
 
-![fig2d: mouse Mphs pathways](../fig2/fig2d_pathways_genes.png)
+![fig2d: mouse Mphs pathways](images/fig2d_pathways_genes.png)

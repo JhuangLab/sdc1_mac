@@ -7,6 +7,8 @@ format:
 execute:
   eval: false   
   echo: true
+  warning: false
+  message: false
 ---
 
 ## set-up
@@ -92,11 +94,11 @@ dev.off()
 
 ```
 
-![fig4f: umap of cd8t adoptive transfer](../fig4/fig4f_umap_cd8t_adoptive.png)
+![fig4f: umap of cd8t adoptive transfer](images/fig4f_umap_cd8t_adoptive.png)
 
-![fig4f: umap of cd8t proportion](../fig4/fig4f_cd8t_adopt_prop_bar.png)
+![fig4f: umap of cd8t proportion](images/fig4f_cd8t_adopt_prop_bar.png)
 
-![fig4g: heatmap of cd8t adoptive transfer](../fig4/fig4g_htp_cd8t_adop_transfer.png)
+![fig4g: heatmap of cd8t adoptive transfer](images/fig4g_htp_cd8t_adoptive.png)
 
 ## fig4h-i: Functional changes of Cd8T cells in CD138 Mph adoptive transfer
 
@@ -169,9 +171,9 @@ ggsave("fig4i_gsea_bar4_adoptive.png", bar4, width = 6.5, height = 6, units = "c
 
 ```
 
-![fig4h: violin of IFN-gamma production score in cd8t adoptive transfer](../fig4/fig4h_vln_ifng_score_adoptive.png)
+![fig4h: violin of IFN-gamma production score in cd8t adoptive transfer](images/fig4h_vln_ifng_score_adoptive.png)
 
-![fig4h: barplot of GSEA in cd8t adoptive transfer](../fig4/fig4i_gsea_bar4_adoptive.png)
+![fig4h: barplot of GSEA in cd8t adoptive transfer](images/fig4i_gsea_bar4_adoptive.png)
 
 ## fig4o-p: Overview of Cd8T cells in CD138 cKO vs WT
 
@@ -227,11 +229,11 @@ dev.off()
 
 ```
 
-![fig4o: umap of cd8t cko vs wt](../fig4/fig4o_umap_cd8t_cko_vs_wt.png)
+![fig4o: umap of cd8t cko vs wt](images/fig4o_umap_cd8t_cko_vs_wt.png)
 
-![fig4o: barplot of cd8t proportion](../fig4/fig4o_bar41_cd8t_cko_vs_wt.png)
+![fig4o: barplot of cd8t proportion](images/fig4o_bar41_cd8t_cko_vs_wt.png)
 
-![fig4p: heatmap of cd8t cko vs wt](../fig4/fig4p_htp_cd8t_sdc1_cko_vs_wt.png)
+![fig4p: heatmap of cd8t cko vs wt](images/fig4p_htp_cd8t_sdc1_cko_vs_wt.png)
 
 ## fig4q-r: Overview of Cd8T cells in CD138 cKO vs WT
 
@@ -274,6 +276,6 @@ ggsave("fig4r_cd8t_cko_gsea_bar.png", bar4, width = 6, height = 6, units = "cm")
 
 ```
 
-![fig4q: violin plot of IFN-gamma production](../fig4/fig4q_cd8t_cko_vln_ifng_score.png)
+![fig4q: violin plot of IFN-gamma production](images/fig4q_cd8t_cko_vln_ifng_score.png)
 
-![fig4r: GSEA of cd8t in cko vs wt](../fig4/fig4r_cd8t_cko_gsea_bar.png)
+![fig4r: GSEA of cd8t in cko vs wt](images/fig4r_cd8t_cko_gsea_bar.png)

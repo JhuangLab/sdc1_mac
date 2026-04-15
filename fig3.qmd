@@ -7,6 +7,8 @@ format:
 execute:
   eval: false   
   echo: true
+  warning: false
+  message: false
 ---
 
 ## set-up
@@ -64,7 +66,7 @@ dev.off()
 
 ```
 
-![fig3d: mouse Mphs bulk RNAseq heatmap](../fig3/fig3d_bulk_mks_heatmap.png)
+![fig3d: mouse Mphs bulk RNAseq heatmap](images/fig3d_bulk_mks_heatmap.png)
 
 ## fig3e: GSEA evaluation of scRNA-seq cells and bulk-RNAseq treatment
 
@@ -98,6 +100,6 @@ ggsave(glue("fig3e_bulk2sce_gsea_dot.png"), dot2, width = 8, height = 6, unit = 
 
 ```
 
-![fig3e: mouse Mphs SCE lineage GSEA](../fig3/fig3e_bulk_feats_corr_lineage_gsea.png)
+![fig3e: mouse Mphs SCE lineage GSEA](images/fig3e_bulk_feats_corr_lineage_gsea.png)
 
-![fig3e: mouse Mphs bulk vs SCE GSEA](../fig3/fig3e_bulk2sce_gsea_dot.png)
+![fig3e: mouse Mphs bulk vs SCE GSEA](images/fig3e_bulk2sce_gsea_dot.png)
