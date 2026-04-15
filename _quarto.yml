@@ -21,7 +21,8 @@ book:
     - href: fig6.qmd
       text: Figure6
     
-    - references.qmd
+    - href: references.qmd
+      text: References
 
 bibliography: references.bib
 
