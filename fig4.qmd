@@ -1,0 +1,279 @@
+---
+title: "fig4"
+author: "Danyang Zhao"
+format:
+  html:
+    embed-resources: true
+execute:
+  eval: false   
+  echo: true
+---
+
+## set-up
+
+```{r set-up}
+
+pkgs <- c("fs", "futile.logger", "configr", "stringr", "ggpubr", "ggthemes", 
+          "jhtools", "glue", "ggsci", "patchwork", "tidyverse", "dplyr", "Seurat", 
+          "paletteer", "viridis", "ComplexHeatmap", "circlize", "readxl")  
+for (pkg in pkgs){
+  suppressPackageStartupMessages(library(pkg, character.only = T))
+}
+project <- "panlab"
+dataset <- "wangchao"
+species <- "mouse"
+workdir <- glue("~/projects/{project}/output/{dataset}/{species}/tenx/figures_260414")
+workdir %>% fs::dir_create() %>% setwd()
+
+config_fn <- "/cluster/home/danyang_jh/projects/panlab/output/wangchao/mouse/tenx/rds/config.yaml"
+mph_cols <- jhtools::show_me_the_colors(config_fn, "mph_cols")
+
+cols_anot251228_v2 <- c(
+  "Naive-like"            = "#FFA500", 
+  "Effector-memory"       = "#94558f", 
+  "Early-activation"      = "#86c7b4", 
+  "Precursor-exhausted-1" = "#9cd2ed", 
+  "Precursor-exhausted-2" = "#a992c0", 
+  "Terminally-exhausted"  = "#94c58f", 
+  "Proliferating"         = "#ea9994"  
+)
+
+my_theme1 <- theme_classic(base_size = 8) +
+  theme(legend.key.size = unit(3, "mm"), axis.text = element_text(color = "black"),
+        axis.line = element_blank(), axis.ticks = element_line(color = "black"), 
+        panel.border = element_rect(linewidth = .5, color = "black", fill = NA))
+glue("{workdir}/fig4") %>% fs::dir_create() %>% setwd()
+
+```
+
+## fig4f-g: Overview of Cd8T cells in CD138 Mph adoptive transfer
+
+```{r fig4f-g}
+rds_fn0 = "/cluster/home/danyang_jh/projects/panlab/analysis/wangchao/mouse/tenx/sdc1_cko_vs_wt/cd8t/projectils/seu_cd8t_adopt.rds"
+seu_cd8t_sub <- read_rds(rds_fn0)
+
+## umap -----
+umap1 <- Seurat::DimPlot(seu_cd8t_sub, group.by = "anot251228_v2", pt.size = .1, 
+                         alpha = .6, reduction = "umap") + 
+  my_theme1 + coord_fixed() + scale_color_manual(values = cols_anot251228_v2) + 
+  labs(x = "UMAP_1", y = "UMAP_2", title = "CD8+ T cells", color = "")
+ggsave("fig4f_umap_cd8t_adoptive.pdf", umap1, width = 8, height = 7, units = "cm")
+ggsave("fig4f_umap_cd8t_adoptive.png", umap1, width = 8, height = 7, units = "cm")
+
+## barplot -----
+tbl4bar_v4 <- seu_cd8t_sub@meta.data %>% dplyr::select(anot251228_v2, group) %>% 
+  group_by(anot251228_v2, group) %>% dplyr::count() %>% ungroup() %>% 
+  mutate(group = group %>% as.character() %>% fct(levels = c("Cd138 Neg", "Cd138 Pos")))
+bar4 <- ggplot2::ggplot(tbl4bar_v4) + 
+  geom_bar(mapping = aes(x = group, fill = anot251228_v2, y = n), 
+           position = "fill", stat = "identity", width = .6, color = "black", linewidth = .3) + 
+  my_theme1 + labs(x = "", y = "Proportion (%)", fill = "") + 
+  scale_fill_manual(values = cols_anot251228_v2) + 
+  theme(legend.text = element_text(size = 7), legend.key.size = unit(2, "mm"), 
+        axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave("fig4f_cd8t_adopt_prop_bar.pdf", bar4, width = 6, height = 4, units = "cm")
+ggsave("fig4f_cd8t_adopt_prop_bar.png", bar4, width = 6, height = 4, units = "cm")
+
+## heatmap -----
+gn_sel2 <- c("Nkg7", "Cxcr6", "Gzmk", "Gzmb", "Cd226", "Cxcr3", "Klrc1", "Cd160", "Ifng")
+mtx4htp <- Seurat::AverageExpression(seu_cd8t_sub, assays = "RNA", 
+                                     features = gn_sel2, group.by = "group") %>% 
+  .[[1]] %>% .[, c(2, 1)] %>% t() %>% scale() %>% t() %>% .[, c("Cd138 Neg", "Cd138 Pos")]
+htp1 <- ComplexHeatmap::Heatmap(mtx4htp, name = "z-score", cluster_columns = F, 
+                                show_row_dend = F, show_column_dend = F, 
+                                row_names_gp = gpar(fontsize = 6), 
+                                column_names_gp = gpar(fontsize = 7), 
+                                column_names_rot = 45, 
+                                width = unit(1, "cm"), height = unit(3, "cm"))
+pdf("fig4g_htp_cd8t_adop_transfer.pdf", width = 2, height = 2)
+print(htp1)
+dev.off()
+
+
+```
+
+![fig4f: umap of cd8t adoptive transfer](../fig4/fig4f_umap_cd8t_adoptive.png)
+
+![fig4f: umap of cd8t proportion](../fig4/fig4f_cd8t_adopt_prop_bar.png)
+
+![fig4g: heatmap of cd8t adoptive transfer](../fig4/fig4g_htp_cd8t_adop_transfer.png)
+
+## fig4h-i: Functional changes of Cd8T cells in CD138 Mph adoptive transfer
+
+```{r functional-evaluation}
+## fig4h -----
+genes_ifng = c("Ifng", "Gzmb", "Gzma", "Gzmk", "Prf1", "Gmly")
+seu_cd8t_v2 <- Seurat::AddModuleScore(
+  seu_cd8t_v2, features = list(ifng = genes_ifng), name = "ifng_score")
+vln_ifng <- Seurat::VlnPlot(seu_cd8t_v2, features = "ifng_score1", 
+                            group.by = "group", pt.size = 0) + 
+  my_theme1 + labs(y = "IFN-gamma score", x = "", title = "") + 
+  Seurat::NoLegend() + ggsci::scale_fill_igv() + 
+  theme(plot.margin = margin(t = -1, b = -1, unit = "cm"))
+ggsave("fig4h_vln_ifng_score_adoptive.pdf", vln_ifng, width = 4, height = 5, units = "cm")
+ggsave("fig4h_vln_ifng_score_adoptive.png", vln_ifng, width = 4, height = 5, units = "cm")
+
+## fig4i -----
+xlsx_fn1 <- "/cluster/home/danyang_jh/projects/panlab/analysis/wangchao/mouse/tenx/adoptive_transfer/T_subset/gsea_res_lst_cd8t_cd138_pos_vs_neg.xlsx"
+gsea_res <- readxl::read_excel(xlsx_fn1, sheet = "m2")
+
+ifng_gnst = c("Ifng", "Gzmb", "Gzma", "Gzmk", "Prf1", "Gmly")
+seu_cd8t_v2 <- Seurat::AddModuleScore(seu_cd8t_v2, 
+                                      features = list(`Ifng production` = ifng_gnst), name = "ifng_production")
+seu_cd8t_v2$group <- seu_cd8t_v2$group %>% as.character() %>% 
+  fct(levels = c("Cd138 Neg", "Cd138 Pos"))
+vln_ifng <- Seurat::VlnPlot(seu_cd8t_v2, features = "ifng_production1", pt.size = 0, 
+                            raster = F, group.by = "group", log = F) + 
+  my_theme1 + labs(title = "CD8+ T cells", y = "IFN-gamma score", x = "") + Seurat::NoLegend() + 
+  theme(axis.line = element_blank(), panel.border = element_rect(fill = NA, linewidth = .5), 
+        axis.text.x = element_text(angle = 30, hjust = .8, size = 7), 
+        axis.title.y = element_text(size = 6), plot.margin = margin(t = -2, b = -1, unit = "cm")) + 
+  ggpubr::stat_compare_means(method = "wilcox.test", label = "p.signif", 
+                             size = 2, label.y.npc = .95, label.x.npc = .45) + 
+  scale_fill_manual(values = c("Cd138 Pos" = "#FFA500", "Cd138 Neg" = "#bb82b1"))
+ggsave("fig4h_vln_ifng_score_adoptive.pdf", vln_ifng, width = 3, height = 5, units = "cm")
+ggsave("fig4h_vln_ifng_score_adoptive.png", vln_ifng, width = 3, height = 5, units = "cm")
+
+## GSEA NES barplot of selected pathways ----
+## gsea barplot -----
+xlsx_fn2 <- "/cluster/home/danyang_jh/projects/panlab/analysis/wangchao/mouse/tenx/adoptive_transfer/T_subset/gsea_res_lst_cd8t_cd138_pos_vs_neg.xlsx"
+gsea_res <- lapply(c("m2", "m5", "mh"), \(ctg) {
+  readxl::read_excel(xlsx_fn2, sheet = ctg)
+}) %>% bind_rows()
+
+path_selected <- c("GOLDRATH_ANTIGEN_RESPONSE", 
+"LI_INDUCED_T_TO_NATURAL_KILLER_UP", 
+"REACTOME_ANTIGEN_PROCESSING_CROSS_PRESENTATION", 
+"REACTOME_CROSS_PRESENTATION_OF_SOLUBLE_EXOGENOUS_ANTIGENS_ENDOSOMES", 
+"GOBP_REGULATION_OF_CYTOKINE_PRODUCTION_INVOLVED_IN_IMMUNE_RESPONSE", 
+"GOMF_CHEMOKINE_ACTIVITY", 
+"GOMF_CYTOKINE_ACTIVITY", 
+"HALLMARK_IL2_STAT5_SIGNALING", 
+"HALLMARK_INTERFERON_ALPHA_RESPONSE", 
+"HALLMARK_OXIDATIVE_PHOSPHORYLATION")
+
+tbl4bar_gsea <- gsea_res %>% dplyr::filter(ID %in% path_selected) %>% 
+  mutate(ID = str_split(ID, "_", simplify = T) %>% .[, -1] %>% 
+           apply(., 1, \(x) paste(x, collapse = " ")) %>% str_to_sentence())
+bar4 <- tbl4bar_gsea %>% dplyr::arrange(desc(NES)) %>% mutate(ID = ID %>% as.character() %>% fct()) %>% 
+  ggplot2::ggplot(aes(x = NES, y = ID, fill = -log10(p.adjust))) + 
+  ggplot2::geom_bar(width = .8, stat = "identity") + 
+  ggplot2::scale_y_discrete(label = \(x) str_wrap(x, width = 35)) + my_theme1 + 
+  labs(x = "NES", y = "") + theme(legend.position = "bottom", 
+                                  legend.margin = margin(l = -2, t = -.2, unit = "cm"), 
+                                  plot.margin = margin(l = -.2, b = .1, t = .1, r = .1, unit = "cm")) + 
+  viridis::scale_fill_viridis()
+ggsave("fig4i_gsea_bar4_adoptive.pdf", bar4, width = 6.5, height = 6, units = "cm")
+ggsave("fig4i_gsea_bar4_adoptive.png", bar4, width = 6.5, height = 6, units = "cm")
+
+
+```
+
+![fig4h: violin of IFN-gamma production score in cd8t adoptive transfer](../fig4/fig4h_vln_ifng_score_adoptive.png)
+
+![fig4h: barplot of GSEA in cd8t adoptive transfer](../fig4/fig4i_gsea_bar4_adoptive.png)
+
+## fig4o-p: Overview of Cd8T cells in CD138 cKO vs WT
+
+```{r fig4o}
+
+rds_fn1 = "/cluster/home/danyang_jh/projects/panlab/analysis/wangchao/mouse/tenx/sdc1_cko_vs_wt/cd8t/projectils/seu_cd8t_cko.rds"
+
+seu_cd8t_v2 = read_rds(rds_fn1)
+seu_cd8t_v2@meta.data$anot251228_v2 <- 
+  seu_cd8t_v2@meta.data$anot251228_v2 %>% as.character() %>% fct(
+    levels = c("Naive-like", "Effector-memory", "Early-activation", 
+               "Precursor-exhausted-1", "Precursor-exhausted-2", 
+               "Terminally-exhausted", "Proliferating")
+  )
+
+## umap ----
+umap4 <- Seurat::DimPlot(seu_cd8t_v2, group.by = "anot251228_v2", 
+                         pt.size = .2, alpha = .6, reduction = "hmy_umap", 
+                         order = F, label = F) + 
+  my_theme1 + scale_color_manual(values = cols_anot251228_v2) + coord_equal() + 
+  labs(x = "UMAP_1", y = "UMAP_2", title = "CD8+ T cells", color = "")
+ggsave("fig4o_umap_cd8t_cko_vs_wt.pdf", umap4, width = 9, height = 4, unit = 'cm')
+ggsave("fig4o_umap_cd8t_cko_vs_wt.png", umap4, width = 9, height = 4, unit = 'cm')
+
+## bar ----
+tbl4bar_v4 <- seu_cd8t_v2@meta.data %>% dplyr::select(anot251228_v2, group) %>% 
+  group_by(anot251228_v2, group) %>% dplyr::count() %>% ungroup() %>% 
+  mutate(group = group %>% as.character() %>% fct(levels = c("WT", "KO")))
+bar4 <- ggplot2::ggplot(tbl4bar_v4) + 
+  geom_bar(mapping = aes(x = group, fill = anot251228_v2, y = n), 
+           position = "fill", stat = "identity", width = .6, color = "black", linewidth = .3) + 
+  my_theme1 + labs(x = "", y = "Proportion (%)", fill = "") + 
+  scale_fill_manual(values = cols_anot251228_v2) + 
+  theme(legend.text = element_text(size = 7), legend.key.size = unit(2, "mm"))
+ggsave("fig4o_bar41_cd8t_cko_vs_wt.pdf", bar4, width = 6, height = 4, units = "cm")
+ggsave("fig4o_bar41_cd8t_cko_vs_wt.png", bar4, width = 6, height = 4, units = "cm")
+
+## fig4p: heatmap -----
+gn_sel2 <-  c("Gzmb", "Cd160", "Tnf", "Cxcr3", "Ccl5", "Tbx21", "Nkg7", "Cxcr6", "Klrd1", "Klrk1", "Ifng", "Klrc1")
+mtx4htp <- Seurat::AverageExpression(seu_cd8t_v2, assays = "RNA", 
+                                     features = gn_sel2, group.by = "group") %>% 
+  .[[1]] %>% .[, c(2, 1)] %>% t() %>% scale() %>% t() %>% .[, c("WT", "KO")]
+htp1 <- ComplexHeatmap::Heatmap(mtx4htp, name = "z-score", cluster_columns = F, 
+                                show_row_dend = F, show_column_dend = F, 
+                                row_names_gp = gpar(fontsize = 6), 
+                                column_names_gp = gpar(fontsize = 7), 
+                                column_names_rot = 45, 
+                                width = unit(1, "cm"), height = unit(3, "cm"))
+pdf("fig4p_htp_cd8t_sdc1_cko_vs_wt.pdf", width = 2, height = 2)
+print(htp1)
+dev.off()
+
+
+```
+
+![fig4o: umap of cd8t cko vs wt](../fig4/fig4o_umap_cd8t_cko_vs_wt.png)
+
+![fig4o: barplot of cd8t proportion](../fig4/fig4o_bar41_cd8t_cko_vs_wt.png)
+
+![fig4p: heatmap of cd8t cko vs wt](../fig4/fig4p_htp_cd8t_sdc1_cko_vs_wt.png)
+
+## fig4q-r: Overview of Cd8T cells in CD138 cKO vs WT
+
+```{r fig4q-r}
+## fig4q: functional evaluation -----
+seu_cd8t_v2 <- Seurat::AddModuleScore(seu_cd8t_v2, 
+                                      features = list(`Ifng production` = ifng_gnst), 
+                                      name = "ifng_production")
+seu_cd8t_v2$group <- seu_cd8t_v2$group %>% as.character() %>% fct(levels = c("WT", "KO"))
+vln_ifng <- Seurat::VlnPlot(seu_cd8t_v2, features = "ifng_production1", pt.size = 0, 
+                            raster = F, group.by = "group", log = F) + 
+  my_theme1 + labs(title = "CD8+ T cells", y = "IFN-gamma score", x = "") + Seurat::NoLegend() + 
+  theme(axis.line = element_blank(), panel.border = element_rect(fill = NA, linewidth = .5), 
+        axis.title.y = element_text(size = 6), plot.margin = margin(t = -2, b = -1, unit = "cm")) + 
+  ggpubr::stat_compare_means(method = "wilcox.test", label = "p.signif", 
+                             size = 2, label.y.npc = .95, label.x.npc = .45) + 
+  scale_fill_manual(values = c("KO" = "#FFA500", "WT" = "#bb82b1"))
+ggsave("fig4q_cd8t_cko_vln_ifng_score.pdf", vln_ifng, width = 3, height = 4, units = "cm")
+ggsave("fig4q_cd8t_cko_vln_ifng_score.png", vln_ifng, width = 3, height = 4, units = "cm")
+
+gsea_res <- lapply(c("m2", "m5", "mh"), \(ctg) {
+  csv_fn <- glue("/cluster/home/danyang_jh/projects/panlab/analysis/wangchao/mouse/tenx/sdc1_cko_vs_wt/cd8t/gsea_{ctg}_cd8t_KO_vs_WT.csv")
+  gsea_res <- read_csv(csv_fn) %>% mutate(category = ctg)
+}) %>% bind_rows()
+
+## fig4r: GSEA bar -----
+tbl4bar_gsea <- gsea_res %>% dplyr::filter(ID %in% path_selected) %>% 
+  mutate(ID = str_split(ID, "_", simplify = T) %>% .[, -1] %>% 
+           apply(., 1, \(x) paste(x, collapse = " ")) %>% str_to_sentence())
+bar4 <- tbl4bar_gsea %>% dplyr::arrange(NES) %>% mutate(ID = ID %>% as.character() %>% fct()) %>% 
+  ggplot2::ggplot(aes(x = NES, y = ID, fill = -log10(p.adjust))) + 
+  ggplot2::geom_bar(width = .8, stat = "identity") + 
+  ggplot2::scale_y_discrete(label = \(x) str_wrap(x, width = 35)) + my_theme1 + 
+  labs(x = "NES", y = "") + theme(legend.position = "bottom", 
+                                  legend.margin = margin(l = -2, t = -.2, unit = "cm"), 
+                                  plot.margin = margin(l = -.2, b = .1, t = .1, r = .1, unit = "cm")) + 
+  viridis::scale_fill_viridis()
+ggsave("fig4r_cd8t_cko_gsea_bar.pdf", bar4, width = 6, height = 6, units = "cm")
+ggsave("fig4r_cd8t_cko_gsea_bar.png", bar4, width = 6, height = 6, units = "cm")
+
+```
+
+![fig4q: violin plot of IFN-gamma production](../fig4/fig4q_cd8t_cko_vln_ifng_score.png)
+
+![fig4r: GSEA of cd8t in cko vs wt](../fig4/fig4r_cd8t_cko_gsea_bar.png)
